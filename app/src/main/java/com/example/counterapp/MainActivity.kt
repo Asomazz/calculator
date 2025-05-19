@@ -58,47 +58,7 @@ fun TrueOrFalse(modifier: Modifier, innerPadding: PaddingValues) {
         verticalArrangement = Arrangement.SpaceAround,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Android is an operating system",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Normal
-        )
-
-
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = modifier
-                .clip(CircleShape)
-                .size(170.dp)
-                .background(color = Color.Green)
-        ) {
-            Text(
-                text = "Correct Answer",
-                fontWeight = FontWeight.Medium,
-                fontSize = 15.sp
-            )
-        }
-        Row(
-            modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-
-            Button(
-                onClick = {},
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
-            ) {
-                Text("True")
-            }
-            Button(
-                onClick = {},
-                modifier = Modifier.weight(1f),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
-            ) {
-                Text("False")
-            }
-        }
-    }
+     }
 }
 //@Composable
 //fun Greeting(name: String, modifier: Modifier = Modifier) {
