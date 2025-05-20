@@ -48,9 +48,9 @@ fun TrueOrFalse(modifier: Modifier, innerPadding: PaddingValues) {
     val completeSound = remember { MediaPlayer.create(context, R.raw.complete_sound) }
 
     val questions = listOf(
-        "Android is an operating system." to true,
-        "Kotlin is supported for iOS development." to false,
-        "Kotlin is supported for Android development." to true
+        "Android is an operating system" to true,
+        "Kotlin is supported for iOS development" to false,
+        "Kotlin is supported for Android development" to true
     )
 
     var currentQuestionIndex by remember { mutableStateOf(0) }
