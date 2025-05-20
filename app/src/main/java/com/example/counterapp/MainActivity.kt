@@ -1,60 +1,52 @@
 package com.example.counterapp
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.counterapp.ui.theme.CounterAppTheme
+import com.example.counterapp.ui.theme.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
             CounterAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()){innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     TrueOrFalse(modifier = Modifier, innerPadding = innerPadding)
                 }
-
-           }
+            }
         }
     }
 }
 
 @Composable
 fun TrueOrFalse(modifier: Modifier, innerPadding: PaddingValues) {
+    val context = LocalContext.current
+    val correctSound = remember { MediaPlayer.create(context, R.raw.correct_sound) }
+    val wrongSound = remember { MediaPlayer.create(context, R.raw.wrong_sound) }
+    val completeSound = remember { MediaPlayer.create(context, R.raw.complete_sound) }
+
     val questions = listOf(
         "Android is an operating system." to true,
         "Kotlin is supported for iOS development." to false,
@@ -68,122 +60,135 @@ fun TrueOrFalse(modifier: Modifier, innerPadding: PaddingValues) {
 
     val currentQuestion = if (currentQuestionIndex < questions.size) questions[currentQuestionIndex] else null
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color.Black, Color(0xFF1C1C1E))
+                )
+            )
             .padding(innerPadding)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceAround,
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (isGameOver) {
-
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
-                text = "Game Over! Your Score: $score / ${questions.size}",
-                fontSize = 24.sp,
+                text = "QUIZ OF WISDOM",
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                fontFamily = FontFamily.SansSerif,
+                color = Color.White
             )
-            Button(onClick = {
-                currentQuestionIndex = 0
-                isAnswerCorrect = null
-                score = 0
-                isGameOver = false
-            }) {
-                Text("Restart Game")
-            }
-        }
-            else {
-            Text(
-                text = currentQuestion?.first ?: "",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Normal
-            )
-            when (isAnswerCorrect) {
-                true -> {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = modifier
-                            .clip(CircleShape)
-                            .size(170.dp)
-                            .background(color = Color.Green)
-                    )
-                    {
-                        Text("Correct Answer")
-                    }
-                    Button(onClick = {
-                        if (currentQuestionIndex < questions.size - 1) {
-                            currentQuestionIndex++
-                            isAnswerCorrect = null
-                        } else {
-                            isGameOver = true
-                        }
-                    }) {
-                        Text("Next Question")
-                    }
-                }
-                false -> {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .size(170.dp)
-                            .background(color = Color.Red)
-                    ) {
-                        Text("Wrong Answer")
-                    }
-                }
-                null -> {
 
-                }
-            }
+            if (isGameOver) {
+                LaunchedEffect(Unit) { completeSound.start() }
 
-            if (isAnswerCorrect != true) {
-                Row(
-                    modifier = modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                Text(
+                    text = "YOUR SCORE: $score / ${questions.size}",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    color = Color.White
+                )
+                Button(
+                    onClick = {
+                        currentQuestionIndex = 0
+                        isAnswerCorrect = null
+                        score = 0
+                        isGameOver = false
+                    },
+                    shape = RoundedCornerShape(0.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                 ) {
+                    Text("RESTART", color = Color.Black)
+                }
+            } else {
+                Text(
+                    text = currentQuestion?.first ?: "",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Light,
+                    fontFamily = FontFamily.SansSerif,
+                    textAlign = TextAlign.Center,
+                    color = Color.White
+                )
 
+                AnimatedVisibility(
+                    visible = isAnswerCorrect != null,
+                    enter = scaleIn(tween(400)) + fadeIn(tween(300))
+                ) {
+                    Text(
+                        text = if (isAnswerCorrect == true) "CORRECT ✅" else "WRONG ❌",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isAnswerCorrect == true) Color(0xFFB6F399) else Color(0xFFFF6B6B)
+                    )
+                }
+
+                if (isAnswerCorrect == true) {
                     Button(
-                        onClick = { val isCorrect = currentQuestion?.second == true
-                            isAnswerCorrect = isCorrect
-                            if (isCorrect) score++},
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
+                        onClick = {
+                            if (currentQuestionIndex < questions.size - 1) {
+                                currentQuestionIndex++
+                                isAnswerCorrect = null
+                            } else {
+                                isGameOver = true
+                            }
+                        },
+                        shape = RoundedCornerShape(0.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
                     ) {
-                        Text("True")
-                    }
-                    Button(
-                        onClick = {  val isCorrect = currentQuestion?.second == false
-                            isAnswerCorrect = isCorrect
-                            if (isCorrect) score++},
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2))
-                    ) {
-                        Text("False")
+                        Text("NEXT", color = Color.Black)
                     }
                 }
 
+                if (isAnswerCorrect != true) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                val isCorrect = currentQuestion?.second == true
+                                isAnswerCorrect = isCorrect
+                                if (isCorrect) {
+                                    score++
+                                    correctSound.start()
+                                } else {
+                                    wrongSound.start()
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(0.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                        ) {
+                            Text("TRUE", color = Color.Black)
+                        }
+
+                        Button(
+                            onClick = {
+                                val isCorrect = currentQuestion?.second == false
+                                isAnswerCorrect = isCorrect
+                                if (isCorrect) {
+                                    score++
+                                    correctSound.start()
+                                } else {
+                                    wrongSound.start()
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(0.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                        ) {
+                            Text("FALSE", color = Color.Black)
+                        }
+                    }
+                }
             }
-
         }
-
-        }
-
     }
-
-//@Composable
-//fun Greeting(name: String, modifier: Modifier = Modifier) {
-//    Text(
-//        text = "Hello $name!",
-//        modifier = modifier
-//    )
-//}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    CounterAppTheme {
-//        Greeting("Android")
-//    }
-//}
+}
